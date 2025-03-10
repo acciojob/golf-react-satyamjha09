@@ -1,52 +1,62 @@
 import React, { Component } from "react";
-import "../styles/App.css";
+import '../styles/App.css';
 
 class App extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      renderBall: false,
-      posi: 0,
-      ballPosition: { left: "0px" },
+      renderBall: false, // Controls whether the ball is rendered
+      ballPosition: { left: "0px" }, // Tracks the ball's position
     };
-
-    this.renderChoice = this.renderBallOrButton.bind(this);
+    this.renderBallOrButton = this.renderBallOrButton.bind(this);
     this.buttonClickHandler = this.buttonClickHandler.bind(this);
-    this.handleKeyPress = this.handleKeyPress.bind(this);
+    this.handleKeyDown = this.handleKeyDown.bind(this);
   }
 
+  // Handles the start button click
   buttonClickHandler() {
     this.setState({ renderBall: true });
   }
 
+  // Handles the Right Arrow key press
+  handleKeyDown(event) {
+    if (event.keyCode === 39) { // 39 is the keyCode for the Right Arrow key
+      this.setState((prevState) => {
+        const newPosition = parseInt(prevState.ballPosition.left, 10) + 5;
+        return { ballPosition: { left: `${newPosition}px` } };
+      });
+    }
+  }
+
+  // Adds the event listener when the component mounts
+  componentDidMount() {
+    document.addEventListener("keydown", this.handleKeyDown);
+  }
+
+  // Removes the event listener when the component unmounts
+  componentWillUnmount() {
+    document.removeEventListener("keydown", this.handleKeyDown);
+  }
+
+  // Renders either the ball or the start button
   renderBallOrButton() {
     if (this.state.renderBall) {
       return <div className="ball" style={this.state.ballPosition}></div>;
     } else {
-      return <button onClick={this.buttonClickHandler}>Start</button>;
-    }
-  }
-
-  componentDidMount() {
-    window.addEventListener("keydown", this.handleKeyPress);
-  }
-
-  componentWillUnmount() {
-    window.removeEventListener("keydown", this.handleKeyPress);
-  }
-
-  handleKeyPress(event) {
-    if (event.keyCode === 39 && this.state.renderBall) {
-      // Move ball 5px right on Right Arrow key press
-      this.setState((prevState) => ({
-        posi: prevState.posi + 5,
-        ballPosition: { left: `${prevState.posi + 5}px` },
-      }));
+      return (
+        <button className="start" onClick={this.buttonClickHandler}>
+          Start
+        </button>
+      );
     }
   }
 
   render() {
-    return <div className="playground">{this.renderBallOrButton()}</div>;
+    return (
+      <div className="playground">
+        {this.renderBallOrButton()}
+      </div>
+    );
   }
 }
 
